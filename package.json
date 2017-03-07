@@ -1,0 +1,17 @@
+{
+  "name": "tpsql",
+  "version": "1.0.0",
+  "description": "nodejs sql",
+  "main": "test.js",
+  "dependencies": {
+    "moment": "^2.17.1",
+    "fs": "^0.0.1-security",
+    "mysql": "^2.13.0"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC"
+}
