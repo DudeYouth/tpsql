@@ -182,7 +182,9 @@ function createData(data) {
     let arr = [];
     foreach(data, (value, key) => {
         if (isNumber(value) || isString(value)) {
-            arr.push(key + '=' + toString(value));
+            arr.push(key + '=' + escape(value));
+        } else if (isObject(value)) {
+
         }
     })
     return arr.join(',');
@@ -214,7 +216,7 @@ function createWhere(data) {
         } else if (isObject(value)) {
             arr.push(key + expfun(value));
         } else if (isString(value) || isNumber(value)) {
-            arr.push(key + '=' + toString(value));
+            arr.push(key + '=' + escape(value));
         }
     })
     return arr.join(' and ');
@@ -234,22 +236,22 @@ function expfun(data) {
             }
             break;
         case 'lt':
-            returnValue = ' < ' + toString(value);
+            returnValue = ' < ' + escape(value);
             break;
         case 'gt':
-            returnValue = ' > ' + toString(value);
+            returnValue = ' > ' + escape(value);
             break;
         case 'egt':
-            returnValue = ' >= ' + toString(value);
+            returnValue = ' >= ' + escape(value);
             break;
         case 'elt':
-            returnValue = ' <= ' + toString(value);
+            returnValue = ' <= ' + escape(value);
             break;
     }
     return returnValue;
 }
 
-function toString(value) {
+function escape(value) {
     return pool.escape(value);
 }
 
