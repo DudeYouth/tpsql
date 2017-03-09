@@ -1,71 +1,69 @@
-'use strict';
-let mysql = require('mysql');
-let moment = require('moment');
-moment.locale('zh-cn');
+"use strict";
+let mysql = require("mysql");
+let moment = require("moment");
+moment.locale("zh-cn");
 let fs = require("fs");
 let dbConfig = {}
 try {
-    dbConfig = fs.readFileSync('conf/db.json', 'utf-8');
+    dbConfig = fs.readFileSync("conf/db.json", "utf-8");
     dbConfig = JSON.parse(dbConfig);
 } catch (err) {
     console.log(err);
-    fs.appendFile('logs/' + moment().format('L') + '-mysql.txt', 'ERROR: ' + err + '\n', () => {});
+    fs.appendFile("logs/" + moment().format("L") + "-mysql.txt", "ERROR: " + err + "\n", () => {});
 }
 let pool = mysql.createPool(dbConfig);
-let connection = () => {
+let query = (sql) => {
+    console.log(sql)
     return new Promise((resolve, reject) => {
-        pool.getConnection((error, data) => {
-            if (error) reject(error);
-            resolve(data);
+        pool.getConnection((error, conn) => {
+            conn.query(sql, (error, data) => {
+                //事件驱动回调  
+                if (error) reject(error);
+                resolve(data);
+                //释放连接  
+                conn.release();
+            });
         });
     });
 
 };
-let execSql = (conn, sql) => {
-    return new Promise((resolve, reject) => {
-        conn.query(sql, (error, data) => {
-            //释放连接  
-            conn.release();
-            //事件驱动回调  
-            if (error) reject(error);
-            resolve(data);
-
-        });
-    })
-}
-async function query(sql) {
-    let conn = await connection();
-    let result = execSql(conn, sql);
-    return result;
-}
-
 class Model {
     constructor() {
         this.name = this.constructor.name;
-        if (this.name.indexOf('Model') == -1) {
-            console.error('name模型命名不规范');
+        if (this.name.indexOf("Model") == -1) {
+            console.error("name模型命名不规范");
         }
         this.config = dbConfig;
-        this.config.prefix = (this.config.prefix || '');
+        this.config.prefix = (this.config.prefix || "");
         this.init();
 
     }
     init() {
-        let tablename = this.name !== 'Model' ? this.name.substring(0, this.name.indexOf('Model')).toLowerCase() : '';
-        this.csql = '';
+        let tablename = this.name !== "Model" ? this.name.substring(0, this.name.indexOf("Model")).toLowerCase() : "";
+        this.csql = "";
         this.tablename = this.addPrefix(tablename);;
-        this.fieldName = ' * ';
+        this.fieldName = " * ";
     }
     add(data) {
-        this.csql = 'insert into ' + this.tablename + ' set ' + createData(data);
-        this.query(this.csql)
+        this.csql = "insert into " + this.tablename + " set " + createData(data);
+        return this.query(this.csql);
+    }
+    addAll(data) {
+        if (isArray(data)) {
+            if (isObject(data[0])) {
+                let keys = Object.keys(data[0]);
+                this.csql = "insert into " + this.tablename + "(" + keys.join(",") + ") values" + createData(data, keys);
+                return this.query(this.csql);
+            }
+        }
+
     }
     update() {
-        this.csql = 'update ' + this.tablename + ' set ' + createData(data);
+        this.csql = "update " + this.tablename + " set " + createData(data);
         return this.query(this.csql);
     }
     delete(data) {
-        this.csql = 'delete from ' + this.tablename + this.csql;
+        this.csql = "delete from " + this.tablename + this.csql;
         return this.query(this.csql);
     }
     addPrefix(tablename) {
@@ -76,39 +74,39 @@ class Model {
         return this;
     }
     join(data) {
-        this.csql += ' inner join' + this.addPrefix(data);
+        this.csql += " inner join" + this.addPrefix(data);
         return this;
     }
     leftJoin(data) {
-        this.csql += ' left join' + this.addPrefix(data);
+        this.csql += " left join" + this.addPrefix(data);
         return this;
     }
     rightJoin(data) {
-        this.csql += ' right join' + this.addPrefix(data);
+        this.csql += " right join" + this.addPrefix(data);
         return this;
     }
     where(data) {
         if (isString(data)) {
-            this.csql += ' where ' + data + ' ';
+            this.csql += " where " + data + " ";
         } else if (isObject(data)) {
-            this.csql += ' where ' + createWhere(data) + ' ';
+            this.csql += " where " + createWhere(data) + " ";
         }
         return this;
     }
     group(data) {
-        this.csql += ' group by' + data;
+        this.csql += " group by" + data;
         return this;
     }
     having(data) {
-        this.csql += ' having ' + data;
+        this.csql += " having " + data;
         return this;
     }
     limit(data) {
-        this.csql += ' limit ' + data;
+        this.csql += " limit " + data;
         return this;
     }
     order(data) {
-        this.csql += ' order by ' + data;
+        this.csql += " order by " + data;
         return this;
     }
     field(data) {
@@ -117,12 +115,12 @@ class Model {
     }
     query(sql) {
         this.sql = sql;
-        fs.appendFile('logs/' + moment().format('L') + '-mysql.txt', 'SQL: ' + sql + '\n', () => {});
+        fs.appendFile("logs/" + moment().format("L") + "-mysql.txt", "SQL: " + sql + "\n", () => {});
         this.init();
         return query(sql);
     }
     select(flag) {
-        let sql = 'select ' + this.fieldName + ' from ' + this.tablename + this.csql;
+        let sql = "select " + this.fieldName + " from " + this.tablename + this.csql;
         if (flag === true) {
             return sql;
         } else {
@@ -130,7 +128,7 @@ class Model {
         }
     }
     async find() {
-        let sql = this.select(true) + ' limit 1';
+        let sql = this.select(true) + " limit 1";
         let result = await this.query(sql);
         if (result && result.length > 0) {
             return result[0];
@@ -144,7 +142,7 @@ class Model {
         let result = await this.query(sql);
         if (result && result.length > 0) {
             if (!result[0][field]) {
-                console.error(field + '字段不存在！');
+                console.error(field + "字段不存在！");
                 return false;
             } else if (flag === true) {
                 result.forEach((value) => {
@@ -162,11 +160,11 @@ class Model {
 }
 
 function isNumber(data) {
-    return (typeof data == 'number') && data.constructor == Number;
+    return (typeof data == "number") && data.constructor == Number;
 }
 
 function isString(data) {
-    return (typeof data == 'string') && data.constructor == String;
+    return (typeof data == "string") && data.constructor == String;
 }
 
 function isArray(data) {
@@ -174,90 +172,117 @@ function isArray(data) {
 }
 
 function isObject(data) {
-    return (Object.prototype.toString.call(data) === '[object Object]');
+    return (Object.prototype.toString.call(data) === "[object Object]");
 }
 
 // 创建数据（数据插入或者数据更新）
-function createData(data) {
+function createData(data, keys = []) {
     let arr = [];
     foreach(data, (value, key) => {
         if (isNumber(value) || isString(value)) {
-            arr.push(key + '=' + escape(value));
+            arr.push(key + "=" + escape(value));
         } else if (isObject(value)) {
+            if (value["exp"]) {
+                arr.push(key + "=" + value["exp"]);
+            } else {
+                let arr2 = [];
+                keys.forEach((v) => {
+                    if (isObject(value[v]) && value[v]["exp"]) {
+                        arr2.push(value[v]["exp"]);
+                    } else {
+                        arr2.push(escape(value[v]));
+                    }
+                })
+                arr.push("(" + arr2.join(",") + ")");
+            }
 
         }
     })
-    return arr.join(',');
+    return arr.join(",");
 }
 
 // 创建where条件
 function createWhere(data) {
     let arr = [];
     foreach(data, (value, key) => {
-        let cache = {};
-        cache[key] = data;
-        let str = '';
         let len = arr.length - 1;
-        str = expfun(cache);
-        if (str) {
-            if (key === 'or') {
-                arr[len] = arr[len] + str;
-            } else {
-
-            }
-        } else if (key === 'exp') { // csql表达式
+        if (key === "exp") { // csql表达式
             arr[len] += value;
-        } else if (key === 'or') { // or表达式
-            if (isString(value)) {
-                arr[len] += ' or ' + value;
-            } else if (isObject(value)) {
-                arr[len] += ' or ' + createWhere(value);
+        } else if (isArray(value)) { // or表达式
+            if (value[0] === "or") {
+                let str = "";
+                if (!isObject(value[1])) {
+                    str = key + expfun({ "eq": value[1] })
+                    arr[len] += len >= 0 ? " or " + str : str + " or";
+                } else {
+                    str = key + expfun(value[1]);
+                    arr[len] += len >= 0 ? " or " + str : str + " or";;
+                }
+                console.log(arr[len])
             }
+            // if (isString(value)) {
+            //     arr[len] += " or " + value;
+            // } else if (isObject(value)) {
+            //     arr[len] += " or " + createWhere(value);
+            // }
         } else if (isObject(value)) {
             arr.push(key + expfun(value));
         } else if (isString(value) || isNumber(value)) {
-            arr.push(key + '=' + escape(value));
+            arr.push(key + "=" + escape(value));
         }
     })
-    return arr.join(' and ');
+
+    return arr.join(" and ");
 }
 // 条件表达式
 function expfun(data) {
     let keys = Object.keys(data);
     let key = keys[0];
     let value = data[key];
-    let returnValue = '';
+    let returnValue = "";
     switch (key) {
-        case 'in':
+        case "in":
             if (isArray(value)) {
-                returnValue = ' in (' + value.join(',') + ')';
+                returnValue = " in (" + value.join(",") + ")";
             } else if (isString(value)) {
-                returnValue = ' in (' + value + ')';
+                returnValue = " in (" + value + ")";
             }
             break;
-        case 'notin':
-            if (isArray(value)) {
-                returnValue = ' notin (' + value.join(',') + ')';
-            } else if (isString(value)) {
-                returnValue = ' notin (' + value + ')';
+        case "like":
+            if (isString(value)) {
+                returnValue = " like " + value + "";
             }
             break;
-        case 'lt':
-            returnValue = ' < ' + escape(value);
+        case "between":
+            if (isString(value)) {
+                returnValue = " between " + value + "";
+            }
             break;
-        case 'gt':
-            returnValue = ' > ' + escape(value);
+        case "notin":
+            if (isArray(value)) {
+                returnValue = " notin (" + value.join(",") + ")";
+            } else if (isString(value)) {
+                returnValue = " notin (" + value + ")";
+            }
             break;
-        case 'egt':
-            returnValue = ' >= ' + escape(value);
+        case "lt":
+            returnValue = " < " + escape(value);
             break;
-        case 'elt':
-            returnValue = ' <= ' + escape(value);
+        case "gt":
+            returnValue = " > " + escape(value);
+            break;
+        case "egt":
+            returnValue = " >= " + escape(value);
+            break;
+        case "elt":
+            returnValue = " <= " + escape(value);
             break;
             break;
-        case 'neq':
-            returnValue = ' != ' + escape(value);
+        case "neq":
+            returnValue = " != " + escape(value);
             break;
+        default:
+            returnValue = " = " + escape(value);
     }
     return returnValue;
 }
@@ -276,7 +301,7 @@ function foreach(data, callback) {
 
 class UsersModel extends Model {
     getMsg() {
-        return this.field('id,mid,gid').where({ id: { 'in': [80, 81] } }).select();
+        return this.addAll([{ "mid": 3, "gid": 5, "account": "dudeyouth", "password": "1234567", "reg_time": { "exp": "now()" } }, { "mid": 6, "gid": 7, "account": "dudeyouth", "password": "1234567", "reg_time": { "exp": "now()" } }]);
     }
 }
 let user = new UsersModel();
