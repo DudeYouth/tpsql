@@ -235,6 +235,13 @@ function expfun(data) {
                 returnValue = ' in (' + value + ')';
             }
             break;
+        case 'notin':
+            if (isArray(value)) {
+                returnValue = ' notin (' + value.join(',') + ')';
+            } else if (isString(value)) {
+                returnValue = ' notin (' + value + ')';
+            }
+            break;
         case 'lt':
             returnValue = ' < ' + escape(value);
             break;
@@ -246,6 +253,10 @@ function expfun(data) {
             break;
         case 'elt':
             returnValue = ' <= ' + escape(value);
+            break;
+            break;
+        case 'neq':
+            returnValue = ' != ' + escape(value);
             break;
     }
     return returnValue;
