@@ -32,6 +32,7 @@
     $model.table('user').field('id,name username,avatar headimg').select();  // 给字段起别名
     // select id,name username,avatar headimg from user;
 ```
+
 ### where()
 > and 与条件查询
 ```javascript
