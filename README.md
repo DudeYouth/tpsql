@@ -8,7 +8,7 @@
     // 第一种实例化方式
     $model = new Model();
     $model.table('user').where({'name':'dudeyouth'}).select();
-    // 第二种实例化方式
+    // 第二种实例化方式（建议使用，适用于MVC模式的M层）
     class UserModel extends Model{
         getUserMsg(){
             return this.where({'name':'dudeyouth'}).select();
