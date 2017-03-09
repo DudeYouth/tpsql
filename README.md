@@ -1,9 +1,9 @@
 # TPSQL
 
 ## 使用方式
--------
 
 ### 实例化模型
+>
 ```javascript
     $model = new Model();
     $model.table('user').where({'name':'dudeyouth'}).select();
