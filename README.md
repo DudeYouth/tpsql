@@ -16,7 +16,7 @@
 ```
 
 * table()
-    * 选择查询表    
+> 选择查询表    
 ```javascript
     $model.table('user').select();
     // select * from user where name='dudeyouth';
