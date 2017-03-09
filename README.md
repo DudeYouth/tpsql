@@ -15,8 +15,8 @@
     $um.getUserMsg();
 ```
 
-##### table()
-+ 选择查询表
++ table()
+选择查询表
 ```javascript
     $model.table('user').select();
     // select * from user where name='dudeyouth';
@@ -24,26 +24,26 @@
     // select * from user u where name='dudeyouth';
 ```
 
-##### field()
-+ 选择查询的字段名
++ field()
+选择查询的字段名
 ```javascript
     $model.table('user').field('id,name,avatar').select();
     // select id,name,avatar from user;
     $model.table('user').field('id,name username,avatar headimg').select();  // 给字段起别名
     // select id,name username,avatar headimg from user;
 ```
-##### where()
-+ and 与条件查询
++ where()
+and 与条件查询
 ```javascript
     $model.table('user').where({'uid':5,'name':'dudeyouth'}).select();
     // select * from user where uid=5 and name='dudeyouth';
 ```
-+ or 或条件查询
+or 或条件查询
 ```javascript
     $model.table('user').where({'uid':5,'or':{'name':'dudeyouth'}}).select();
     // select * from user where uid=5 or name='dudeyouth';
 ```
-+ in 区域查询 
+in 区域查询 
 ```javascript
     $model.table('user').where({'uid':{'in':[1,2,2]}}).select();
     // select * from user where uid in (1,2,3);
