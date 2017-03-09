@@ -15,8 +15,8 @@
     $um.getUserMsg();
 ```
 
-+ table()
-选择查询表
+### * table()
+> 选择查询表
 ```javascript
     $model.table('user').select();
     // select * from user where name='dudeyouth';
@@ -24,8 +24,8 @@
     // select * from user u where name='dudeyouth';
 ```
 
-+ field()
-选择查询的字段名
+### * field()
+> 选择查询的字段名
 ```javascript
     $model.table('user').field('id,name,avatar').select();
     // select id,name,avatar from user;
