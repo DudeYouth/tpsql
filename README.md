@@ -51,3 +51,29 @@
 ```
 > or
 
+### group
+
+
+### having
+
+
+### order
+
+
+### limit
+
+
+### select
+
+
+### find
+
+
+### field
+
+
+### getField
+
+
+ 
+
