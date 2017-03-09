@@ -5,12 +5,13 @@
 ### 实例化模型
 >
 ```javascript
+    // 第一种实例化方式
     $model = new Model();
     $model.table('user').where({'name':'dudeyouth'}).select();
-    // 上面的例子等同于
+    // 第二种实例化方式
     class UserModel extends Model{
         getUserMsg(){
-            this.where({'name':'dudeyouth'}).select();
+            return this.where({'name':'dudeyouth'}).select();
         }
     }
     $um = new UserModel();
