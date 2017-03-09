@@ -16,13 +16,13 @@
 ```
 
 * table()
-    * 选择查询表
-       *    ```javascript
-                $model.table('user').select();
-                // select * from user where name='dudeyouth';
-                $model.table('user u').select();  // 给表起别名
-                // select * from user u where name='dudeyouth';
-            ```
+    * 选择查询表    
+```javascript
+    $model.table('user').select();
+    // select * from user where name='dudeyouth';
+    $model.table('user u').select();  // 给表起别名
+    // select * from user u where name='dudeyouth';
+```
 
 ### * field()
 > 选择查询的字段名
