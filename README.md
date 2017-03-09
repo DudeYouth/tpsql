@@ -17,7 +17,7 @@
     $um.getUserMsg();
 ```
 
-### table()
+### table
 > 选择查询表    
 ```javascript
     $model.table('user').select();
@@ -26,7 +26,7 @@
     // select * from user u where name='dudeyouth';
 ```
 
-### field()
+### field
 > 选择查询的字段名
 ```javascript
     $model.table('user').field('id,name,avatar').select();
@@ -35,7 +35,7 @@
     // select id,name username,avatar headimg from user;
 ```
 
-### where()
+### where
 > and 与条件查询
 ```javascript
     $model.table('user').where({'uid':5,'name':'dudeyouth'}).select();
@@ -70,7 +70,7 @@
     // select * from user where uid != 3;
 ```
 
-### group()
+### group
 > 分组
 ```javascript
     $model.table('user').field('count(*)').where({'uid':[1,2,3,4,5]}).group('level').select();
@@ -114,7 +114,7 @@
     // 输出：{uid:5,name:...,create_time:...}
 ```
 
-### getField()
+### getField
 > 获取符合条件的字段内容（只获取1个）
 ```javascript
     $model.table('user').where({'uid':[1,2,3,4,5]}).getField('name');
