@@ -130,7 +130,7 @@ class Model {
         }
     }
     async find() {
-        let sql = this.select(true);
+        let sql = this.select(true) + ' limit 1';
         let result = await this.query(sql);
         if (result && result.length > 0) {
             return result[0];

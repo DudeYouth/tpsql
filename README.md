@@ -46,34 +46,127 @@
 ```
 > in 区域查询 
 ```javascript
-    $model.table('user').where({'uid':{'in':[1,2,2]}}).select();
+    $model.table('user').where({'uid':{'in':[1,2,3]}}).select();
     // select * from user where uid in (1,2,3);
 ```
-> or
+> 等式查询
+```javascript
+    /* lt 小于*/
+    $model.table('user').where({'uid':{'lt':3}}).select();
+    // select * from user where uid < 3;
+    /* gt 大于*/
+    $model.table('user').where({'uid':{'gt':3}}).select();
+    // select * from user where uid > 3;
+    /* elt 小于等于*/
+    $model.table('user').where({'uid':{'elt':3}}).select();
+    // select * from user where uid <= 3;
+    /* egt 大于等于*/
+    $model.table('user').where({'uid':{'egt':3}}).select();
+    // select * from user where uid >= 3;
+    /* neq 不等于*/
+    $model.table('user').where({'uid':{'neq':3}}).select();
+    // select * from user where uid != 3;
+```
 
-### group
-
+### group()
+> 分组
+```javascript
+    $model.table('user').field('count(*)').where({'uid':[1,2,3,4,5]}).group('level').select();
+    // select * from user where uid in (1,2,3);
+```
 
 ### having
-
+> 分组的条件
+```javascript
+    $model.table('user').where({'uid':[1,2,3,4,5]}).group('level,uid').having('count(uid)>2').select();
+    // select * from user where uid in (1,2,3);
+```
 
 ### order
-
+> 排序
+```javascript
+    $model.table('user').where({'uid':[1,2,3,4,5]}).order('create_time DESC').select();
+    // select * from user where uid in (1,2,3);
+```
 
 ### limit
-
+> 分页
+```javascript
+    $model.table('user').where({'uid':[1,2,3,4,5]}).limit('10,15').select();
+    // select * from user where uid in (1,2,3);
+```
 
 ### select
-
+> 查询所有符合条件的数据
+```javascript
+    $model.table('user').where({'uid':[1,2,3,4,5]}).select();
+    // select * from user where uid in (1,2,3);
+    // 输出：[{uid:1,name:...,create_time:...},{uid:2,name:...,create_time:...},{uid:3,name:...,create_time:...}...]
+```
 
 ### find
+> 查询第一条符合条件的数据
+```javascript
+    $model.table('user').where({'uid':5}).find();
+    // select * from user where uid =5;
+    // 输出：{uid:5,name:...,create_time:...}
+```
+
+### getField()
+> 获取符合条件的字段内容（只获取1个）
+```javascript
+    $model.table('user').where({'uid':[1,2,3,4,5]}).getField('name');
+    // select name from user where uid in (1,2,3,4,5) limit 1;
+    // 输出：name
+```
+> 获取符合条件的字段内容（获取所有）
+```javascript
+    $model.table('user').where({'uid':[1,2,3,4,5]}).getField('name',true);
+    // select name from user where uid in (1,2,3,4,5);
+    // 输出：[name1,name2,name3,name4,name5]
+```
+
+### add 
+> 插入数据
+```javascript
+    $model.table('user').add({'name':'dudeyouth','create_time':1482613131});
+    // insert into user set name='dudeyouth',create_time=1482613131;
+```
+
+### update
+> 更新数据
+```javascript
+    $model.table('user').update({'name':'dudeyouth','create_time':1482613131});
+    // update user set name='dudeyouth',create_time=1482613131;
+```
+
+### delete
+> 删除数据
+```javascript
+    $model.table('user').where({'uid':5}).delete();
+    // delete from user where uid=5;
+```
+
+### join
+> 联表inner join
+```javascript
+    $model.table('user u').join('user_group ug on u.id=ug.uid').select();
+    // select * from user u inner join user_group ug on u.id=ug.uid;
+```
+
+### leftJoin
+> 联表left join
+```javascript
+    $model.table('user u').leftJoin('user_group ug on u.id=ug.uid').select();
+    // select * from user u left join user_group ug on u.id=ug.uid;
+```
+
+### rightJoin
+> 联表right join
+```javascript
+    $model.table('user u').rightJoin('user_group ug on u.id=ug.uid').select();
+    // select * from user u right join user_group ug on u.id=ug.uid;
+```
 
 
-### field
-
-
-### getField
-
-
- 
 
