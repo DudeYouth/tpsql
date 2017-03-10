@@ -1,7 +1,5 @@
 # TPSQL
 
-## 使用方式
-
 ### 数据库配置
 > 配置文件路径在项目根目录：conf/db.json
 ```javascript
