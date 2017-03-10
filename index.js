@@ -9,7 +9,7 @@ try {
     dbConfig = JSON.parse(dbConfig);
 } catch (err) {
     console.log(err);
-    fs.appendFile("logs/" + moment().format("L") + "-mysql.txt", "ERROR: " + err + "\n", () => {});
+    fs.appendFile((dbConfig.logsrc || "logs/") + moment().format("L") + "-mysql.txt", "ERROR: " + err + "\n", () => {});
 }
 let pool = mysql.createPool(dbConfig);
 let query = (sql) => {
@@ -35,6 +35,7 @@ class Model {
         }
         this.config = dbConfig;
         this.config.prefix = (this.config.prefix || "");
+        this.aliasName = '';
         this.init();
 
     }
@@ -43,6 +44,10 @@ class Model {
         this.csql = "";
         this.tablename = this.addPrefix(tablename);;
         this.fieldName = " * ";
+    }
+    alias(name) {
+        this.aliasName = ' ' + name + ' ';
+        return this;
     }
     add(data) {
         this.csql = "insert into " + this.tablename + " set " + createData(data);
@@ -74,15 +79,15 @@ class Model {
         return this;
     }
     join(data) {
-        this.csql += " inner join" + this.addPrefix(data);
+        this.csql += " inner join " + this.addPrefix(data);
         return this;
     }
     leftJoin(data) {
-        this.csql += " left join" + this.addPrefix(data);
+        this.csql += " left join " + this.addPrefix(data);
         return this;
     }
     rightJoin(data) {
-        this.csql += " right join" + this.addPrefix(data);
+        this.csql += " right join " + this.addPrefix(data);
         return this;
     }
     where(data) {
@@ -94,15 +99,23 @@ class Model {
         return this;
     }
     group(data) {
-        this.csql += " group by" + data;
+        this.csql += " group by " + data;
         return this;
     }
     having(data) {
-        this.csql += " having " + data;
+        if (isString(data)) {
+            this.csql += " having " + data;
+        } else if (isObject(data)) {
+            this.csql += " having " + createWhere(data);
+        }
         return this;
     }
     limit(data) {
-        this.csql += " limit " + data;
+        if (isString(data)) {
+            this.csql += " limit " + data;
+        } else if (isArray(data)) {
+            this.csql += " limit " + data.join(',');
+        }
         return this;
     }
     order(data) {
@@ -115,12 +128,12 @@ class Model {
     }
     query(sql) {
         this.sql = sql;
-        fs.appendFile("logs/" + moment().format("L") + "-mysql.txt", "SQL: " + sql + "\n", () => {});
+        fs.appendFile((dbConfig.logsrc || "logs/") + moment().format("L") + "-mysql.txt", "SQL: " + sql + "\n", () => {});
         this.init();
         return query(sql);
     }
     select(flag) {
-        let sql = "select " + this.fieldName + " from " + this.tablename + this.csql;
+        let sql = "select " + this.fieldName + " from " + this.tablename + this.aliasName + this.csql;
         if (flag === true) {
             return sql;
         } else {
@@ -256,6 +269,8 @@ function expfun(data) {
         case "between":
             if (isString(value)) {
                 returnValue = " between " + value + "";
+            } else if (isArray(value)) {
+                returnValue = " between " + value.join(' and ') + "";
             }
             break;
         case "notin":
@@ -301,7 +316,7 @@ function foreach(data, callback) {
 
 class UsersModel extends Model {
     getMsg() {
-        return this.addAll([{ "mid": 3, "gid": 5, "account": "dudeyouth", "password": "1234567", "reg_time": { "exp": "now()" } }, { "mid": 6, "gid": 7, "account": "dudeyouth", "password": "1234567", "reg_time": { "exp": "now()" } }]);
+        return this.alias('u').join('users_msg um um.id=u.mid').where({ 'u.id': 1 }).group('u.id').having({ 'u.id': { gt: 1 } }).limit([1, 5]).select();
     }
 }
 let user = new UsersModel();

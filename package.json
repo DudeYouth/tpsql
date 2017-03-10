@@ -12,6 +12,14 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "author": "",
-  "license": "ISC"
+  "author": "dudeyouth",
+  "license": "ISC",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/DudeYouth/tpsql.git"
+  },
+  "bugs": {
+    "url": "https://github.com/DudeYouth/tpsql/issues"
+  },
+  "homepage": "https://github.com/DudeYouth/tpsql#readme"
 }
