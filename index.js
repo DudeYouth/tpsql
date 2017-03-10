@@ -314,4 +314,4 @@ function foreach(data, callback) {
     })
 }
 
-exports.module = Model;
+module.exports = Model;
