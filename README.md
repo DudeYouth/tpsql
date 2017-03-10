@@ -5,6 +5,11 @@
 
 ## 使用说明
 
+### 加载
+```javascript
+let Model = require('tpsql/index');
+```
+
 ### 数据库配置
 > 配置文件路径在项目根目录：conf/db.json
 ```json

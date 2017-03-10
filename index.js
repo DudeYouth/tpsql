@@ -314,14 +314,4 @@ function foreach(data, callback) {
     })
 }
 
-class UsersModel extends Model {
-    getMsg() {
-        return this.alias('u').join('users_msg um um.id=u.mid').where({ 'u.id': 1 }).group('u.id').having({ 'u.id': { gt: 1 } }).limit([1, 5]).select();
-    }
-}
-let user = new UsersModel();
-async function test() {
-    let result = await user.getMsg();
-    console.log(result, user.sql);
-}
-test();
+exports.module = Model;
